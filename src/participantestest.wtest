@@ -1,0 +1,72 @@
+import cumbre.*
+import conocimientos.*
+
+describe"Test de participantes"{
+	const argentina = new Pais()
+	const brasil = new Pais()
+	const colombia = new Pais()
+	const coreaDelSur = new Pais()
+	const coreaDelNorte = new Pais()
+	
+	const juana = new Programador(
+		pais = argentina,
+		conocimientos = #{programacionBasica, css, html},
+		commits = 600
+	)
+	const lucia = new Programador(
+		pais = brasil,
+		conocimientos = #{programacionBasica, basesDeDatos},
+		commits = 800
+	)
+	const mariana = new Especialista(
+		pais = argentina,
+		conocimientos = #{programacionBasica, instalacionLinux, objetos, disenioConObjetos},
+		commits = 200
+	)
+	const susana = new Especialista(
+		pais = colombia,
+		conocimientos = #{programacionBasica, objetos},
+		commits = 1500
+	)
+	
+	method initialize(){
+		cumbre.registrarPersona(juana)
+		cumbre.registrarPersona(lucia)
+		cumbre.registrarPersona(mariana)
+		cumbre.agregarPaises(#{argentina,colombia,coreaDelNorte})
+		coreaDelSur.agregarConflicto(coreaDelNorte)
+		coreaDelNorte.agregarConflicto(coreaDelSur)
+	}
+	
+	test"Los paises de la cumbre son Argentina y brasil"{
+		assert.equals(#{argentina,brasil}, cumbre.paisesDeParticipantes())
+	}
+	test"El pais con mas participantes es argentina"{
+		assert.equals(argentina, cumbre.paisConMasParticipantes())
+	}
+	test"La cumbre es relevante"{
+		assert.equals(true, cumbre.esRelevante())
+	}
+	test"Agregando a susana ahora los paises son Argentina, brasil y colombia"{
+		cumbre.registrarPersona(susana)
+		assert.equals(#{colombia,argentina,brasil}, cumbre.paisesDeParticipantes())
+	}
+	test"El pais con mas participantes sigue siendo argentina"{
+		cumbre.registrarPersona(susana)
+		assert.equals(argentina, cumbre.paisConMasParticipantes())
+	}
+	test"La cumbre ya no es relevante"{
+		cumbre.registrarPersona(susana)
+		assert.equals(false, cumbre.esRelevante())
+	}
+	test"susana no es capa"{
+		assert.equals(false, susana.esCapa())
+	}
+	test"Corea del sur es conflictivo para la cumbre"{
+		assert.equals(true, cumbre.esConflictivo(coreaDelSur))
+	}
+	test"La unica participante extranjera es lucia"{
+		assert.equals(#{lucia}, cumbre.participantesExtranjeros())
+	}
+	
+}
