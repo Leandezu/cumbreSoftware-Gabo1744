@@ -1,15 +1,31 @@
 import conocimientos.*
+import participantes.*
+
+class Pais{
+	var conflictos = #{}
+	
+	method conflictos() = conflictos
+	method agregarConflicto(unPais){
+		conflictos.add(unPais)
+	}
+	method registrarConflicto(unPais){
+		return conflictos.contains(unPais)
+	}
+}
 
 object cumbre{
 	var paisesAuspiciantes = #{}
 	var participantes = #{}
+	var actividadesRealizadas = #{}
 	var property commits = 300
+	var horasDeActividades = 0
 	
 	method agregarPaises(unConjunto){
 		paisesAuspiciantes.addAll(unConjunto)
 	}
-	method registrarPersona(unaPersona){
-		participantes.add(unaPersona)
+
+	method esAuspiciante(unPais){
+		return paisesAuspiciantes.any({p => p == unPais})
 	}
 	method esIgualA(pais){
 		return paisesAuspiciantes.any({p => p == pais})
@@ -38,48 +54,19 @@ object cumbre{
 	method esRelevante(){
 		return participantes.all({p => p.esCapa()})
 	}
-}
-
-class Pais{
-	var conflictos = #{}
-	
-	method conflictos() = conflictos
-	method agregarConflicto(unPais){
-		conflictos.add(unPais)
+	method validarPersona(persona){
+		return not self.esConflictivo(persona.pais()) and
+		(self.cantParticipantesDelPais(persona.pais()) > 2 or
+		 self.esAuspiciante(persona.pais())
+		)
 	}
-	method registrarConflicto(unPais){
-		return conflictos.contains(unPais)
+	method registrarPersona(unaPersona){
+		if(not unaPersona.cumpleRequisitos() and not self.validarPersona(unaPersona)){
+			self.error("No cumple los requisitos")
+		}
+		participantes.add(unaPersona)
 	}
-}
-
-class Participante{
-	var pais
-	var conocimientos = #{}
-	var commits
-	
-	method pais() = pais
-	method esCapa()
-	method cumpleRequisitos(){
-		return conocimientos.contains(programacionBasica)
-	}
-}
-
-class Programador inherits Participante{
-	override method esCapa(){
-		return commits > 500
-	}
-	override method cumpleRequisitos(){
-		return super() and commits >= cumbre.commits()
-	}
-}
-
-class Especialista inherits Participante{
-	override method esCapa(){
-		return conocimientos.size() > 2
-	}
-	override method cumpleRequisitos(){
-		return super() and
-		commits >= (cumbre.commits() - 100) and
-		conocimientos.contains(objetos)
+	method esSegura(){
+		return participantes.all({p => p.cumpleRequisitos() and self.validarPersona(p)})
 	}
 }

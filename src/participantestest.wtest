@@ -1,5 +1,6 @@
 import cumbre.*
 import conocimientos.*
+import participantes.*
 
 describe"Test de participantes"{
 	const argentina = new Pais()
